@@ -41,12 +41,10 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         id: image-info
         env:
-          ECR_REGISTRY: 753324040823.dkr.ecr.ap-northeast-1.amazonaws.com
-          ECR_REPOSITORY: demo-frontend
-          IMAGE_TAG: ${{ steps.image.outputs.version }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPO_NAME }}
         run: |
-          echo "::set-output name=ecr_repository::$ECR_REPOSITORY"
-          echo "::set-output name=image_tag::$IMAGE_TAG"
+          IMAGE_TAG=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push 753324040823.dkr.ecr.ap-northeast-1.amazonaws.com/demo-frontend:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
